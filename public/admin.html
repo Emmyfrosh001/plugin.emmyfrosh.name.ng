@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Review Desk — EMMYFROSH Plugin Hub</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker admin-brand">𝛯𝛭𝛭𝒀𝑭𝑹𝛩𝑺𝛨 💔</p>
+    <nav><a href="/">Back</a></nav>
+  </header>
+
+  <div id="gate" class="gate">
+    <h2>ADMIN PASSWORD</h2>
+    <div class="field">
+      <label for="key">Admin key</label>
+      <input id="key" type="password" placeholder="••••••••" />
+    </div>
+    <button id="unlock" class="btn btn-primary" type="button">Login</button>
+    <p id="gateError" class="hint" style="color:#e28564;"></p>
+  </div>
+
+  <section id="deskPanel" class="panel">
+    <div id="pendingList"></div>
+  </section>
+
+  <footer class="admin-footer">
+    <a href="/">Back</a>
+    <p>Built by 𝛯𝛭𝛭𝒀𝑭𝑹𝛩𝑺𝛨 💔</p>
+  </footer>
+
+</div>
+
+<script>
+const KEY_STORAGE = "emmyfrosh_admin_key";
+// NOTE: this only gives fast client-side feedback. The real gate is still
+// your backend — it must accept this exact string as the x-admin-key header
+// (e.g. as an env var) or the API call below will still fail even if this matches.
+const ADMIN_PASSWORD = "emmyfrosh123@.com";
+let adminKey = sessionStorage.getItem(KEY_STORAGE) || "";
+
+const gate = document.getElementById("gate");
+const deskPanel = document.getElementById("deskPanel");
+const pendingList = document.getElementById("pendingList");
+const gateError = document.getElementById("gateError");
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, {
+    ...opts,
+    headers: { "Content-Type": "application/json", "x-admin-key": adminKey, ...(opts.headers || {}) },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Request failed.");
+  return data;
+}
+
+async function tryUnlock() {
+  adminKey = document.getElementById("key").value.trim();
+  if (adminKey !== ADMIN_PASSWORD) {
+    gateError.textContent = "That key didn't work.";
+    return;
+  }
+  try {
+    await api("/api/plugins/pending");
+    sessionStorage.setItem(KEY_STORAGE, adminKey);
+    gate.style.display = "none";
+    deskPanel.classList.add("active");
+    loadPending();
+  } catch (err) {
+    gateError.textContent = "That key didn't work.";
+  }
+}
+
+document.getElementById("unlock").addEventListener("click", tryUnlock);
+document.getElementById("key").addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(); });
+
+async function loadPending() {
+  pendingList.innerHTML = '<p class="hint">Loading…</p>';
+  try {
+    const items = await api("/api/plugins/pending");
+    if (!items.length) {
+      pendingList.innerHTML = '<div class="empty-state">Queue is empty — nothing waiting on review.</div>';
+      return;
+    }
+    pendingList.innerHTML = items.map(p => `
+      <article class="entry" data-id="${p.id}">
+        <div class="entry-top">
+          <h3>${escapeHtml(p.name)}</h3>
+          <span class="entry-meta">by ${escapeHtml(p.author)} · ${new Date(p.createdAt).toLocaleString()}</span>
+        </div>
+        <span class="tag">${escapeHtml(p.category)}</span>
+        ${p.description ? `<p class="entry-desc">${escapeHtml(p.description)}</p>` : ""}
+        <pre class="ticket-code">${escapeHtml(p.code)}</pre>
+        <div class="ticket-actions">
+          <button class="btn btn-accept" data-action="accept" data-id="${p.id}" type="button">Accept → publish raw URL</button>
+          <button class="btn btn-reject" data-action="reject" data-id="${p.id}" type="button">Reject</button>
+        </div>
+      </article>
+    `).join("");
+
+    pendingList.querySelectorAll("button[data-action]").forEach(btn => {
+      btn.addEventListener("click", () => handleAction(btn.dataset.id, btn.dataset.action));
+    });
+  } catch (err) {
+    pendingList.innerHTML = '<div class="empty-state">Could not load the queue.</div>';
+  }
+}
+
+async function handleAction(id, action) {
+  try {
+    if (action === "reject") {
+      const reason = prompt("Reason for rejecting (optional):") || "";
+      await api(`/api/plugins/${id}/reject`, { method: "POST", body: JSON.stringify({ reason }) });
+    } else {
+      const result = await api(`/api/plugins/${id}/accept`, { method: "POST" });
+      alert(`Published:\n${result.rawUrl}`);
+    }
+    loadPending();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Resume a session without re-typing the key.
+if (adminKey) {
+  api("/api/plugins/pending").then(() => {
+    gate.style.display = "none";
+    deskPanel.classList.add("active");
+    loadPending();
+  }).catch(() => { sessionStorage.removeItem(KEY_STORAGE); });
+}
+</script>
+</body>
+</html>
