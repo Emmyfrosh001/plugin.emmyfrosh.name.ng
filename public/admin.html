@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Review Desk — EMMYFROSH Plugin Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#060c1f;
+    --navy:#0c1830;
+    --navy-panel:#101f42;
+    --navy-panel-2:#132349;
+    --blue:#3b82f6;
+    --blue-bright:#5aa3ff;
+    --ice:#8fc7ff;
+    --green:#2fd6a7;
+    --purple:#8b6bff;
+    --coral:#ff6b6b;
+    --text:#eaf1ff;
+    --text-dim:#9fb1d4;
+    --border:rgba(143,199,255,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--navy-deep);
+    color:var(--text);
+    min-height:100vh;
+  }
+  .app{
+    display:grid;
+    grid-template-columns:260px 1fr;
+    min-height:100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    background:var(--navy);
+    border-right:1px solid var(--border);
+    padding:28px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:0 6px;
+  }
+  .brand-icon{
+    width:38px;height:38px;
+    border-radius:10px;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+  }
+  .brand-name{font-weight:700;font-size:15px;letter-spacing:0.2px;}
+  .brand-name span{display:block;font-size:11px;color:var(--text-dim);font-weight:500;}
+
+  nav.navlist{display:flex;flex-direction:column;gap:4px;}
+  .navitem{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 14px;
+    border-radius:10px;
+    color:var(--text-dim);
+    font-size:14px;
+    font-weight:500;
+    cursor:pointer;
+    user-select:none;
+  }
+  .navitem .dot{width:18px;text-align:center;font-size:15px;}
+  .navitem.active{
+    background:linear-gradient(135deg,var(--blue),#2f63d4);
+    color:#fff;
+    box-shadow:0 6px 18px -6px rgba(59,130,246,0.6);
+  }
+  .navitem:not(.active):hover{background:rgba(143,199,255,0.06);color:var(--text);}
+
+  .sidebar-foot{margin-top:auto;}
+  .btn-logout{
+    width:100%;
+    display:flex;align-items:center;gap:10px;justify-content:center;
+    padding:11px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text-dim);
+    font-size:14px;font-weight:600;
+    cursor:pointer;
+  }
+  .btn-logout:hover{color:var(--text);border-color:var(--ice);}
+
+  /* ---------- Main ---------- */
+  main{padding:26px 34px 60px;}
+  .topbar{
+    display:flex;align-items:center;justify-content:flex-end;gap:18px;
+    margin-bottom:22px;
+  }
+  .icon-btn{
+    width:38px;height:38px;border-radius:10px;
+    background:var(--navy-panel);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-dim);cursor:default;
+  }
+
+  /* ---------- Hero / welcome ---------- */
+  .hero{
+    position:relative;
+    border-radius:20px;
+    overflow:hidden;
+    padding:36px 40px;
+    margin-bottom:26px;
+    background:
+      radial-gradient(ellipse at 15% 20%, rgba(90,163,255,0.20), transparent 55%),
+      linear-gradient(180deg,#0e1c3f 0%, #0a1533 60%, #081128 100%);
+    border:1px solid var(--border);
+  }
+  .hero::before{
+    content:"";
+    position:absolute;inset:0;
+    background-image: radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,255,255,0.7) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 30% 60%, rgba(255,255,255,0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 50% 15%, rgba(255,255,255,0.6) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 70% 45%, rgba(255,255,255,0.4) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 85% 70%, rgba(255,255,255,0.6) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 92% 25%, rgba(255,255,255,0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 40% 85%, rgba(255,255,255,0.4) 50%, transparent 51%);
+    opacity:0.9;
+    pointer-events:none;
+  }
+  .hero-content{position:relative;z-index:1;}
+  .hero-title{
+    font-size:32px;
+    font-weight:600;
+    margin:0 0 22px;
+    color:var(--text);
+  }
+  .hero-title .brandname{
+    font-family:'Playfair Display',serif;
+    font-style:italic;
+    background:linear-gradient(90deg,#fff,var(--ice));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+  }
+  .stat-card{
+    border-radius:16px;
+    padding:20px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    border:1px solid var(--border);
+  }
+  .stat-card.pending{background:linear-gradient(160deg,#153a7a,#0f2b63);}
+  .stat-card.accepted{background:linear-gradient(160deg,#12744f,#0d5a3d);}
+  .stat-card.rejected{background:linear-gradient(160deg,#6e2f5e,#54223f);}
+  .stat-top{display:flex;align-items:center;gap:12px;}
+  .stat-icon{
+    width:42px;height:42px;border-radius:12px;
+    background:rgba(255,255,255,0.14);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+  }
+  .stat-label{font-size:14px;color:rgba(255,255,255,0.85);font-weight:600;}
+  .stat-value{font-size:30px;font-weight:700;color:#fff;}
+  .stat-sub{font-size:12.5px;color:rgba(255,255,255,0.7);}
+  .stat-link{font-size:12.5px;color:#fff;font-weight:600;text-decoration:underline;cursor:pointer;margin-top:2px;}
+
+  /* ---------- Panel / queue ---------- */
+  .panel{
+    background:var(--navy-panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px 24px 26px;
+  }
+  .panel-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .panel-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;}
+  .panel-title .dot{color:var(--ice);}
+
+  .hint{color:var(--text-dim);font-size:13.5px;}
+
+  .empty-state{
+    padding:40px 20px;text-align:center;color:var(--text-dim);
+    border:1px dashed var(--border);border-radius:14px;
+  }
+
+  .entry{
+    background:var(--navy-panel-2);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 20px;
+    margin-bottom:14px;
+  }
+  .entry-top{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;margin-bottom:8px;
+  }
+  .entry-top h3{margin:0;font-size:16px;font-weight:700;}
+  .entry-meta{font-size:12.5px;color:var(--text-dim);}
+  .tag{
+    display:inline-block;
+    font-size:11.5px;font-weight:700;
+    padding:4px 10px;border-radius:999px;
+    background:rgba(139,107,255,0.18);
+    color:var(--purple);
+    margin-bottom:10px;
+  }
+  .entry-desc{color:var(--text-dim);font-size:13.5px;margin:0 0 12px;}
+  .ticket-code{
+    background:#070d1f;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px;
+    font-size:12.5px;
+    color:#c8d8f5;
+    overflow-x:auto;
+    max-height:220px;
+    margin:0 0 14px;
+  }
+  .ticket-actions{display:flex;gap:10px;}
+  .btn{
+    border:none;border-radius:9px;
+    padding:9px 16px;
+    font-size:13px;font-weight:700;
+    cursor:pointer;
+  }
+  .btn-accept{background:linear-gradient(135deg,var(--green),#1fae87);color:#04241a;}
+  .btn-reject{background:rgba(255,107,107,0.14);color:#ff9d9d;border:1px solid rgba(255,107,107,0.35);}
+  .btn-primary{background:linear-gradient(135deg,var(--blue),#2f63d4);color:#fff;}
+
+  /* ---------- Gate ---------- */
+  .gate-wrap{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(90,163,255,0.18), transparent 55%),
+      linear-gradient(180deg,#0e1c3f 0%, #0a1533 55%, #060c1f 100%);
+    padding:20px;
+  }
+  .gate{
+    width:100%;max-width:380px;
+    background:var(--navy-panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:34px 30px;
+    text-align:center;
+  }
+  .gate .brand-icon{margin:0 auto 16px;}
+  .gate h2{font-size:15px;letter-spacing:1px;color:var(--text-dim);margin:0 0 20px;font-weight:700;}
+  .field{text-align:left;margin-bottom:18px;}
+  .field label{display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;font-weight:600;}
+  .field input{
+    width:100%;padding:11px 13px;
+    border-radius:10px;border:1px solid var(--border);
+    background:#0a1430;color:var(--text);font-size:14px;
+  }
+  .field input:focus{outline:none;border-color:var(--ice);}
+  .gate .btn-primary{width:100%;padding:11px;font-size:14px;}
+  .gate .hint{margin-top:12px;min-height:16px;}
+
+  footer.admin-footer{
+    text-align:center;
+    padding:26px 0 6px;
+    color:var(--text-dim);
+    font-size:12.5px;
+  }
+  footer.admin-footer .brandname{
+    font-family:'Playfair Display',serif;font-style:italic;color:var(--ice);
+  }
+
+  @media (max-width:860px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{display:none;}
+    .stat-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div id="gateScreen" class="gate-wrap">
+  <div class="gate">
+    <div class="brand-icon">🛡️</div>
+    <h2>ADMIN ACCESS</h2>
+    <div class="field">
+      <label for="key">Admin key</label>
+      <input id="key" type="password" placeholder="••••••••" />
+    </div>
+    <button id="unlock" class="btn btn-primary" type="button">Login</button>
+    <p id="gateError" class="hint" style="color:#ff9d9d;"></p>
+  </div>
+</div>
+
+<div id="appScreen" class="app" style="display:none;">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-name">Admin Dashboard<span>Plugin Review Desk</span></div>
+    </div>
+    <nav class="navlist">
+      <div class="navitem active"><span class="dot">🏠</span> Dashboard</div>
+      <div class="navitem"><span class="dot">⏳</span> Depending</div>
+      <div class="navitem"><span class="dot">✅</span> Accepted</div>
+      <div class="navitem"><span class="dot">💡</span> Suggestion</div>
+      <div class="navitem"><span class="dot">⚙️</span> Settings</div>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="btn-logout" id="logoutBtn" type="button">⎋ Logout</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="icon-btn">🔔</div>
+      <div class="icon-btn">👤</div>
+    </div>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">Welcome back, <span class="brandname">ΞΜΜΥFROSH</span> 💔</h1>
+        <div class="stat-row">
+          <div class="stat-card pending">
+            <div class="stat-top"><div class="stat-icon">⏳</div><div class="stat-label">Depending</div></div>
+            <div class="stat-value" id="statPending">–</div>
+            <div class="stat-sub">Items waiting on review</div>
+          </div>
+          <div class="stat-card accepted">
+            <div class="stat-top"><div class="stat-icon">✅</div><div class="stat-label">Accepted</div></div>
+            <div class="stat-value" id="statAccepted">0</div>
+            <div class="stat-sub">Accepted this session</div>
+          </div>
+          <div class="stat-card rejected">
+            <div class="stat-top"><div class="stat-icon">✖</div><div class="stat-label">Rejected</div></div>
+            <div class="stat-value" id="statRejected">0</div>
+            <div class="stat-sub">Rejected this session</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="dot">☰</span> Pending Review</div>
+        <span class="hint" id="queueHint"></span>
+      </div>
+      <div id="pendingList"></div>
+    </section>
+
+    <footer class="admin-footer">
+      Built by <span class="brandname">ΞΜΜΥFROSH</span> 💔
+    </footer>
+  </main>
+</div>
+
+<script>
+const KEY_STORAGE = "emmyfrosh_admin_key";
+// NOTE: this only gives fast client-side feedback. The real gate is still
+// your backend — it must accept this exact string as the x-admin-key header
+// (e.g. as an env var) or the API call below will still fail even if this matches.
+const ADMIN_PASSWORD = "emmyfrosh123@.com";
+let adminKey = sessionStorage.getItem(KEY_STORAGE) || "";
+let acceptedCount = 0;
+let rejectedCount = 0;
+
+const gateScreen = document.getElementById("gateScreen");
+const appScreen = document.getElementById("appScreen");
+const pendingList = document.getElementById("pendingList");
+const gateError = document.getElementById("gateError");
+const queueHint = document.getElementById("queueHint");
+const statPending = document.getElementById("statPending");
+const statAccepted = document.getElementById("statAccepted");
+const statRejected = document.getElementById("statRejected");
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, {
+    ...opts,
+    headers: { "Content-Type": "application/json", "x-admin-key": adminKey, ...(opts.headers || {}) },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Request failed.");
+  return data;
+}
+
+function showApp() {
+  gateScreen.style.display = "none";
+  appScreen.style.display = "grid";
+  loadPending();
+}
+
+function showGate() {
+  appScreen.style.display = "none";
+  gateScreen.style.display = "flex";
+}
+
+async function tryUnlock() {
+  adminKey = document.getElementById("key").value.trim();
+  if (adminKey !== ADMIN_PASSWORD) {
+    gateError.textContent = "That key didn't work.";
+    return;
+  }
+  try {
+    await api("/api/plugins/pending");
+    sessionStorage.setItem(KEY_STORAGE, adminKey);
+    showApp();
+  } catch (err) {
+    gateError.textContent = "That key didn't work.";
+  }
+}
+
+document.getElementById("unlock").addEventListener("click", tryUnlock);
+document.getElementById("key").addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(); });
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  sessionStorage.removeItem(KEY_STORAGE);
+  adminKey = "";
+  showGate();
+});
+
+async function loadPending() {
+  pendingList.innerHTML = '<p class="hint">Loading…</p>';
+  try {
+    const items = await api("/api/plugins/pending");
+    statPending.textContent = items.length;
+    queueHint.textContent = items.length ? `${items.length} waiting` : "";
+
+    if (!items.length) {
+      pendingList.innerHTML = '<div class="empty-state">Queue is empty — nothing waiting on review.</div>';
+      return;
+    }
+    pendingList.innerHTML = items.map(p => `
+      <article class="entry" data-id="${p.id}">
+        <div class="entry-top">
+          <h3>${escapeHtml(p.name)}</h3>
+          <span class="entry-meta">by ${escapeHtml(p.author)} · ${new Date(p.createdAt).toLocaleString()}</span>
+        </div>
+        <span class="tag">${escapeHtml(p.category)}</span>
+        ${p.description ? `<p class="entry-desc">${escapeHtml(p.description)}</p>` : ""}
+        <pre class="ticket-code">${escapeHtml(p.code)}</pre>
+        <div class="ticket-actions">
+          <button class="btn btn-accept" data-action="accept" data-id="${p.id}" type="button">Accept → publish raw URL</button>
+          <button class="btn btn-reject" data-action="reject" data-id="${p.id}" type="button">Reject</button>
+        </div>
+      </article>
+    `).join("");
+
+    pendingList.querySelectorAll("button[data-action]").forEach(btn => {
+      btn.addEventListener("click", () => handleAction(btn.dataset.id, btn.dataset.action));
+    });
+  } catch (err) {
+    pendingList.innerHTML = '<div class="empty-state">Could not load the queue.</div>';
+  }
+}
+
+async function handleAction(id, action) {
+  try {
+    if (action === "reject") {
+      const reason = prompt("Reason for rejecting (optional):") || "";
+      await api(`/api/plugins/${id}/reject`, { method: "POST", body: JSON.stringify({ reason }) });
+      rejectedCount++;
+      statRejected.textContent = rejectedCount;
+    } else {
+      const result = await api(`/api/plugins/${id}/accept`, { method: "POST" });
+      acceptedCount++;
+      statAccepted.textContent = acceptedCount;
+      alert(`Published:\n${result.rawUrl}`);
+    }
+    loadPending();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Resume a session without re-typing the key.
+if (adminKey) {
+  api("/api/plugins/pending").then(() => {
+    showApp();
+  }).catch(() => { sessionStorage.removeItem(KEY_STORAGE); });
+}
+</script>
+</body>
+</html>
