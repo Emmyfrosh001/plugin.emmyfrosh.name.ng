@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EMMYFROSH Plugin Desk</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --paper: #05070f;
+  --paper-raised: #10152c;
+  --paper-line: rgba(91, 141, 255, 0.18);
+  --ink: #eef2ff;
+  --ink-dim: #9fb0d9;
+  --stamp-amber: #5b8dff;
+  --stamp-amber-dim: #33447a;
+  --stamp-red: #ff6b7a;
+  --stamp-blue: #7fc7e0;
+  --accent-purple: #9b6bff;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius: 3px;
+}
+
+* { box-sizing: border-box; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+html, body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 900px 500px at 50% -10%, rgba(91,141,255,0.14), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 90% 15%, rgba(155,107,255,0.10), transparent 55%),
+    linear-gradient(rgba(5,7,15,0.97), rgba(5,7,15,0.99)),
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.008) 3px, rgba(255,255,255,0.008) 4px);
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--stamp-amber);
+  outline-offset: 2px;
+}
+
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ── Masthead ─────────────────────────────────────────────────── */
+.masthead {
+  padding: 44px 0 22px;
+  border-bottom: 1px solid var(--paper-line);
+  margin-bottom: 32px;
+}
+
+.masthead .kicker {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--stamp-blue);
+  margin: 0 0 10px;
+}
+
+.masthead h1 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(30px, 5vw, 42px);
+  line-height: 1.05;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, var(--stamp-amber), var(--accent-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.masthead p {
+  color: var(--ink-dim);
+  max-width: 54ch;
+  margin: 0;
+  font-size: 15px;
+}
+
+.masthead nav {
+  margin-top: 22px;
+  display: flex;
+  gap: 4px;
+}
+
+.masthead nav a, .tab-btn {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 9px 16px;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.masthead nav a:hover, .tab-btn:hover { color: var(--ink); border-color: var(--stamp-amber-dim); }
+
+.tab-btn.active {
+  color: #ffffff;
+  background: linear-gradient(90deg, var(--stamp-amber), var(--accent-purple));
+  border-color: transparent;
+}
+
+/* ── Sections / panels ────────────────────────────────────────── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin-bottom: 14px;
+}
+
+/* ── Plugin listing cards ─────────────────────────────────────── */
+.entry {
+  border: 1px solid var(--paper-line);
+  background: var(--paper-raised);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.entry-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.entry-top h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.entry-meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.entry-desc {
+  color: var(--ink-dim);
+  font-size: 14.5px;
+  margin: 8px 0 14px;
+}
+
+.tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--stamp-blue);
+  border: 1px solid var(--stamp-amber-dim);
+  border-radius: var(--radius);
+  padding: 2px 8px;
+  margin-right: 8px;
+}
+
+.raw-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  margin-top: 10px;
+}
+
+.raw-row code {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--stamp-blue);
+  overflow-x: auto;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.empty-state {
+  border: 1px dashed var(--paper-line);
+  border-radius: var(--radius);
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+button {
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.btn {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--paper-line);
+  background: transparent;
+  color: var(--ink);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn:hover { border-color: var(--stamp-amber-dim); }
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--stamp-amber), var(--accent-purple));
+  border-color: transparent;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-primary:hover { filter: brightness(1.08); }
+
+.btn-accept { border-color: var(--stamp-amber); color: var(--stamp-amber); }
+.btn-reject { border-color: var(--stamp-red); color: var(--stamp-red); }
+.btn-small { padding: 6px 12px; font-size: 12px; }
+
+/* ── Form ─────────────────────────────────────────────────────── */
+.field { margin-bottom: 18px; }
+
+.field label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin-bottom: 6px;
+}
+
+.field input, .field textarea, .field select {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  padding: 11px 12px;
+  font-family: var(--sans);
+  font-size: 14.5px;
+}
+
+.field textarea:focus, .field input:focus, .field select:focus {
+  border-color: var(--stamp-amber-dim);
+}
+
+.code-field textarea {
+  font-family: var(--mono);
+  font-size: 13px;
+  min-height: 320px;
+  white-space: pre;
+  tab-size: 2;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.field-row { display: flex; gap: 14px; }
+.field-row .field { flex: 1; }
+
+.hint { font-size: 12.5px; color: var(--ink-dim); margin-top: 6px; }
+.hint code { font-family: var(--mono); color: var(--stamp-blue); background: var(--paper); border-radius: 4px; padding: 1px 5px; }
+.hint.err { color: var(--stamp-red); }
+.hint.err code { color: var(--stamp-red); background: rgba(255,107,122,0.1); }
+
+.field input:invalid:not(:placeholder-shown) { border-color: var(--stamp-red); }
+
+.status-msg {
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-bottom: 18px;
+  display: none;
+}
+
+.status-msg.show { display: block; }
+.status-msg.ok { background: rgba(91,141,255,0.10); border: 1px solid var(--stamp-amber-dim); color: var(--stamp-amber); }
+.status-msg.err { background: rgba(255,107,122,0.12); border: 1px solid var(--stamp-red); color: #ff8f9a; }
+
+/* ── Admin ────────────────────────────────────────────────────── */
+.gate {
+  max-width: 380px;
+  margin: 80px auto 0;
+  border: 1px solid var(--paper-line);
+  background: var(--paper-raised);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.gate h2 { margin-top: 0; font-size: 18px; }
+
+.ticket-code {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 12px 0 14px;
+  color: #bfe6ff;
+}
+
+.ticket-actions { display: flex; gap: 10px; }
+
+/* ── Plugins search ────────────────────────────────────────────── */
+.browse-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.browse-head .section-label {
+  margin-bottom: 0;
+}
+
+.search-wrap {
+  flex: 1 1 220px;
+  max-width: 300px;
+}
+
+.search-wrap input[type="search"] {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: 999px;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  padding: 9px 16px;
+}
+
+.search-wrap input[type="search"]::placeholder {
+  color: var(--ink-dim);
+}
+
+.search-wrap input[type="search"]:focus {
+  outline: none;
+  border-color: var(--stamp-amber-dim);
+}
+
+/* ── Hamburger menu ───────────────────────────────────────────── */
+.menu-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 50;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid var(--paper-line);
+  background: var(--paper-raised);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.menu-dropdown {
+  position: fixed;
+  top: 68px;
+  right: 20px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 8px;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+.menu-dropdown[hidden] { display: none; }
+
+.menu-item {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-dim);
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+}
+
+.menu-item:hover {
+  color: var(--ink);
+  background: rgba(91,141,255,0.08);
+}
+
+/* ── Tap-to-expand plugin code ────────────────────────────────── */
+.entry { cursor: pointer; }
+.entry .raw-row, .entry .code-view { cursor: default; }
+
+.tap-hint {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+  opacity: 0.75;
+  margin: 10px 0 0;
+}
+
+.code-view {
+  margin-top: 10px;
+}
+
+.code-view .ticket-code {
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .field-row { flex-direction: column; }
+  .wrap { padding: 0 16px 60px; }
+  .menu-toggle { top: 14px; right: 14px; }
+  .menu-dropdown { top: 60px; right: 14px; }
+}
+
+</style>
+</head>
+<body>
+
+<button id="menuToggle" class="menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Open menu">
+  <span></span><span></span><span></span>
+</button>
+<div id="menuDropdown" class="menu-dropdown" hidden>
+  <a class="menu-item" href="/admin">Admin login</a>
+  <button class="menu-item" data-tab="plugins" type="button">Plugins</button>
+  <button class="menu-item" data-tab="suggestion" type="button">Suggestion</button>
+</div>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>𝛯𝛭𝛭𝒀𝑭𝑹𝛩𝑺𝛨 𝑷𝑳𝑼𝑮𝑰𝑵𝑺</h1>
+    <p>Explore a world of plugins for your 𝛯𝛭𝛭𝒀𝑭𝑹𝛩𝑺𝛨 WhatsApp Bot. Discover new features, install powerful tools, create custom plugins, and share your innovations with the community.</p>
+    <p class="kicker">Extend your bot. Customize your experience. Build without limits.</p>
+    <nav>
+      <button class="tab-btn active" data-tab="plugins" type="button">Plugins</button>
+      <button class="tab-btn" data-tab="create" type="button">Create plugin</button>
+    </nav>
+  </header>
+
+  <!-- ── PLUGINS ────────────────────────────────────────────── -->
+  <section id="panel-plugins" class="panel active">
+    <div class="browse-head">
+      <p class="section-label">ACCEPTED PLUGINS</p>
+      <div class="search-wrap">
+        <input type="search" id="pluginSearch" placeholder="Search by plugin name or author" autocomplete="off" />
+      </div>
+    </div>
+    <div id="list"></div>
+  </section>
+
+  <!-- ── CREATE ─────────────────────────────────────────────── -->
+  <section id="panel-create" class="panel">
+    <p class="section-label">CREATE PLUGIN</p>
+
+    <div id="submitStatus" class="status-msg"></div>
+
+    <form id="submitForm" novalidate>
+      <div class="field-row">
+        <div class="field">
+          <label for="name">Plugin name</label>
+          <input id="name" name="name" type="text" placeholder="calculator.js" pattern="^.+\.js$" title="Must end with .js" required maxlength="120" />
+          <p class="hint" id="name-hint">Must end with <code>.js</code> — e.g. <code>calculator.js</code></p>
+        </div>
+        <div class="field">
+          <label for="author">Your name</label>
+          <input id="author" name="author" type="text" placeholder="bj" required maxlength="80" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" name="category">
+            <option value="general">General</option>
+            <option value="fun">Fun / Games</option>
+            <option value="tools">Tools</option>
+            <option value="media">Media / Downloader</option>
+            <option value="group">Group / Admin</option>
+            <option value="ai">AI</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="description">Short description</label>
+          <input id="description" name="description" type="text" placeholder="What does it do?" maxlength="500" />
+        </div>
+      </div>
+
+      <div class="field code-field">
+        <label for="code">Plugin code</label>
+        <textarea id="code" name="code" spellcheck="false" placeholder="export default { name: 'calc', command: ['calc'], run: async (m, { args }) => { ... } }" required></textarea>
+        <p class="hint">We check that this parses as valid JavaScript before it goes into the review queue. It's read by a human before anything is published — nothing here is auto-executed.</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit for review</button>
+    </form>
+  </section>
+
+  <!-- ── SUGGESTION ─────────────────────────────────────────── -->
+  <section id="panel-suggestion" class="panel">
+    <p class="section-label">SUGGESTION</p>
+
+    <div id="suggestStatus" class="status-msg"></div>
+
+    <form id="suggestForm" novalidate>
+      <div class="field">
+        <label for="s-name">Your name (optional)</label>
+        <input id="s-name" name="s-name" type="text" placeholder="Optional" maxlength="80" />
+      </div>
+      <div class="field">
+        <label for="s-whatsapp">Your WhatsApp number (optional)</label>
+        <input id="s-whatsapp" name="s-whatsapp" type="tel" placeholder="+234..." maxlength="20" />
+      </div>
+      <div class="field">
+        <label for="s-message">Your suggestion</label>
+        <textarea id="s-message" name="s-message" style="min-height:140px;" placeholder="What should we add or improve?" required maxlength="1000"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Send suggestion</button>
+    </form>
+  </section>
+
+</div>
+
+<script>
+// NOTE: this assumes GET /api/plugins/:id returns { code } for a single plugin,
+// and that POST /api/suggestions accepts { name, message }. Adjust the two
+// constants below if your backend uses different paths.
+const API = "/api/plugins";
+const SUGGEST_API = "/api/suggestions";
+
+const listEl = document.getElementById("list");
+const searchEl = document.getElementById("pluginSearch");
+const tabButtons = document.querySelectorAll(".tab-btn[data-tab]");
+const menuTabItems = document.querySelectorAll(".menu-item[data-tab]");
+const panels = {
+  plugins: document.getElementById("panel-plugins"),
+  create: document.getElementById("panel-create"),
+  suggestion: document.getElementById("panel-suggestion"),
+};
+let allPlugins = [];
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+function pluginId(p) {
+  return p.id ?? p._id ?? p.slug ?? p.name;
+}
+
+/* ---------- Tabs + hamburger menu ---------- */
+
+function setActiveTab(name) {
+  Object.entries(panels).forEach(([key, el]) => el.classList.toggle("active", key === name));
+  tabButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.tab === name));
+  closeMenu();
+}
+
+[...tabButtons, ...menuTabItems].forEach(el => {
+  el.addEventListener("click", (e) => {
+    e.preventDefault();
+    setActiveTab(el.dataset.tab);
+  });
+});
+
+const menuToggle = document.getElementById("menuToggle");
+const menuDropdown = document.getElementById("menuDropdown");
+
+function closeMenu() {
+  menuDropdown.hidden = true;
+  menuToggle.setAttribute("aria-expanded", "false");
+}
+function toggleMenu() {
+  const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+  menuDropdown.hidden = isOpen;
+  menuToggle.setAttribute("aria-expanded", String(!isOpen));
+}
+menuToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toggleMenu();
+});
+document.addEventListener("click", (e) => {
+  if (!menuDropdown.hidden && !menuDropdown.contains(e.target) && e.target !== menuToggle) closeMenu();
+});
+
+/* ---------- Plugin list + tap-to-expand code ---------- */
+
+function renderList(plugins, isFiltered) {
+  if (!plugins.length) {
+    listEl.innerHTML = isFiltered
+      ? '<div class="empty-state">No plugins match that search.</div>'
+      : '<div class="empty-state">No plugins have been published yet. Be the first — switch to "Create plugin".</div>';
+    return;
+  }
+  listEl.innerHTML = plugins.map(p => `
+    <article class="entry" data-id="${escapeHtml(String(pluginId(p)))}">
+      <div class="entry-top">
+        <h3>${escapeHtml(p.name)}</h3>
+        <span class="entry-meta">by ${escapeHtml(p.author)} · ${new Date(p.createdAt).toLocaleDateString()}</span>
+      </div>
+      <span class="tag">${escapeHtml(p.category)}</span>
+      ${p.description ? `<p class="entry-desc">${escapeHtml(p.description)}</p>` : ""}
+      <div class="raw-row">
+        <code>${escapeHtml(p.rawUrl)}</code>
+        <button class="btn btn-small copy-btn" data-url="${escapeHtml(p.rawUrl)}" type="button">Copy</button>
+      </div>
+      <p class="tap-hint">Tap to see how this plugin was built</p>
+      <div class="code-view" style="display:none;"></div>
+    </article>
+  `).join("");
+
+  listEl.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      await navigator.clipboard.writeText(btn.dataset.url);
+      const original = btn.textContent;
+      btn.textContent = "Copied";
+      setTimeout(() => (btn.textContent = original), 1200);
+    });
+  });
+}
+
+async function fetchPluginCode(plugin) {
+  if (plugin.code) return plugin.code;
+  try {
+    const res = await fetch(`${API}/${encodeURIComponent(pluginId(plugin))}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.code || null;
+  } catch {
+    return null;
+  }
+}
+
+listEl.addEventListener("click", async (e) => {
+  if (e.target.closest(".copy-btn")) return;
+  const entry = e.target.closest(".entry");
+  if (!entry) return;
+
+  const id = entry.dataset.id;
+  const plugin = allPlugins.find(p => String(pluginId(p)) === String(id));
+  if (!plugin) return;
+
+  const codeView = entry.querySelector(".code-view");
+  const hint = entry.querySelector(".tap-hint");
+  const isOpen = entry.classList.toggle("expanded");
+
+  if (!isOpen) {
+    codeView.style.display = "none";
+    hint.textContent = "Tap to see how this plugin was built";
+    return;
+  }
+
+  hint.textContent = "Tap to hide the code";
+  codeView.style.display = "block";
+  if (codeView.dataset.loaded === "true") return;
+
+  codeView.innerHTML = '<p class="hint">Loading code…</p>';
+  const code = await fetchPluginCode(plugin);
+  codeView.innerHTML = code
+    ? `<pre class="ticket-code">${escapeHtml(code)}</pre>`
+    : '<p class="hint">Couldn\u2019t load the source for this plugin.</p>';
+  codeView.dataset.loaded = "true";
+});
+
+async function loadPlugins() {
+  listEl.innerHTML = '<p class="hint">Loading…</p>';
+  try {
+    const res = await fetch(API);
+    const plugins = await res.json();
+    allPlugins = plugins;
+    renderList(plugins);
+  } catch (err) {
+    listEl.innerHTML = '<div class="empty-state">Could not load plugins right now.</div>';
+  }
+}
+
+if (searchEl) {
+  searchEl.addEventListener("input", () => {
+    const q = searchEl.value.trim().toLowerCase();
+    if (!q) {
+      renderList(allPlugins, false);
+      return;
+    }
+    const filtered = allPlugins.filter(p =>
+      (p.name || "").toLowerCase().includes(q) ||
+      (p.author || "").toLowerCase().includes(q)
+    );
+    renderList(filtered, true);
+  });
+}
+
+/* ---------- Create plugin form ---------- */
+
+const form = document.getElementById("submitForm");
+const statusEl = document.getElementById("submitStatus");
+const nameInput = document.getElementById("name");
+const nameHint = document.getElementById("name-hint");
+
+function isValidPluginName(value) {
+  return /\.js$/.test(value.trim());
+}
+
+function updateNameHint() {
+  const value = nameInput.value.trim();
+  if (!value) {
+    nameHint.classList.remove("err");
+    return;
+  }
+  nameHint.classList.toggle("err", !isValidPluginName(value));
+}
+
+nameInput.addEventListener("input", updateNameHint);
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  statusEl.className = "status-msg";
+
+  const name = nameInput.value.trim();
+  if (!isValidPluginName(name)) {
+    statusEl.textContent = "Plugin name must end with .js — e.g. calculator.js";
+    statusEl.className = "status-msg err show";
+    nameHint.classList.add("err");
+    nameInput.focus();
+    return;
+  }
+
+  const body = {
+    name: name,
+    author: document.getElementById("author").value,
+    category: document.getElementById("category").value,
+    description: document.getElementById("description").value,
+    code: document.getElementById("code").value,
+  };
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      statusEl.textContent = data.error || "Submission failed.";
+      statusEl.className = "status-msg err show";
+      return;
+    }
+
+    statusEl.textContent = "Submitted. It's in the review queue — you'll see it under Plugins once it's accepted and gets a raw URL.";
+    statusEl.className = "status-msg ok show";
+    form.reset();
+  } catch (err) {
+    statusEl.textContent = "Could not reach the server. Try again.";
+    statusEl.className = "status-msg err show";
+  }
+});
+
+document.getElementById("code").addEventListener("keydown", (e) => {
+  if (e.key === "Tab") {
+    e.preventDefault();
+    const el = e.target;
+    const start = el.selectionStart, end = el.selectionEnd;
+    el.value = el.value.slice(0, start) + "  " + el.value.slice(end);
+    el.selectionStart = el.selectionEnd = start + 2;
+  }
+});
+
+/* ---------- Suggestion form ---------- */
+
+const suggestForm = document.getElementById("suggestForm");
+const suggestStatus = document.getElementById("suggestStatus");
+
+suggestForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  suggestStatus.className = "status-msg";
+  const body = {
+    name: document.getElementById("s-name").value,
+    whatsapp: document.getElementById("s-whatsapp").value,
+    message: document.getElementById("s-message").value,
+  };
+
+  try {
+    const res = await fetch(SUGGEST_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      suggestStatus.textContent = "Could not send your suggestion. Try again.";
+      suggestStatus.className = "status-msg err show";
+      return;
+    }
+
+    suggestStatus.textContent = "Thanks — your suggestion has been sent.";
+    suggestStatus.className = "status-msg ok show";
+    suggestForm.reset();
+  } catch (err) {
+    suggestStatus.textContent = "Could not reach the server. Try again.";
+    suggestStatus.className = "status-msg err show";
+  }
+});
+
+loadPlugins();
+</script>
+</body>
+</html>
