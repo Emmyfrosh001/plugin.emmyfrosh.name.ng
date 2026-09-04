@@ -1,0 +1,21 @@
+{
+  "name": "EMMYFROSH-PLUGIN-HUB",
+  "version": "1.0.0",
+  "description": "EMMYFROSH Plugin Hub - submit, review and publish WhatsApp bot plugins as raw URLs",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "echo 'No build step required'"
+  },
+  "author": "EMMYFROSH-IA",
+  "license": "ISC",
+  "dependencies": {
+    "acorn": "^8.18.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}
